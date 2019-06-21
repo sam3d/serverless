@@ -1,0 +1,7 @@
+{
+  "name": "custom-resource",
+  "dependencies": {
+    "aws-sdk": "^2.479.0",
+    "cfn-lambda": "^4.0.0"
+  }
+}

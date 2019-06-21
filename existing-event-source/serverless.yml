@@ -1,0 +1,51 @@
+service: existing-event-source
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  iamRoleStatements:
+    - Effect: Allow
+      Resource: arn:aws:lambda:*:*:function:${self:custom.functionName}
+      Action:
+        - lambda:AddPermission
+    - Effect: Allow
+      Resource: arn:aws:s3:::${self:custom.bucketName}
+      Action:
+        - s3:PutBucketNotification
+        - s3:GetBucketNotification
+
+package:
+  excludeDevDependencies: false
+
+custom:
+  functionName: serverless-existing-s3-function
+  bucketName: serverless-existing-s3-bucket
+
+functions:
+  # this is the Lambda function to which we add an existing S3 bucket
+  test:
+    handler: test-function/handler.handler
+    name: ${self:custom.functionName}
+  # this is the Lambda function for our custom resource to handle existing S3 buckets
+  existingS3BucketHelper:
+    handler: existing-s3/handler.handler
+
+resources:
+  Resources:
+    TestCustomResource:
+      Type: Custom::TestCustomResource
+      Version: 1.0
+      DependsOn: [
+        TestLambdaFunction,
+        ExistingS3BucketHelperLambdaFunction
+      ]
+      Properties:
+        ServiceToken: !GetAtt ExistingS3BucketHelperLambdaFunction.Arn
+        FunctionName: ${self:custom.functionName}
+        BucketName: ${self:custom.bucketName}
+        BucketConfig:
+          Event: s3:ObjectCreated:*
+          Rules:
+            - Prefix: uploads
+            - Suffix: .jpg
+

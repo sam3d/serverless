@@ -1,0 +1,14 @@
+{
+  "name": "@serverless/custom-resource-s3",
+  "description": "Custom CloudFormation Resource for S3 buckets",
+  "author": "serverless.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/serverless/serverless"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.480.0",
+    "cfn-lambda": "^4.0.0"
+  }
+}
